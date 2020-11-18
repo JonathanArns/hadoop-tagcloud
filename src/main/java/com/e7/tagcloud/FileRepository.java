@@ -28,7 +28,7 @@ public class FileRepository {
 
     public void saveMultipart(MultipartFile multipartFile) throws IOException {
         String fileName = multipartFile.getOriginalFilename();
-        File file = new File("/lkj/" + uploadPath + fileName);
+        File file = new File("/tmp/" + uploadPath + fileName);
 //        file.getParentFile().mkdirs();
         file.createNewFile();
         multipartFile.transferTo(file);
