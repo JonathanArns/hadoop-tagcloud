@@ -7,7 +7,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -22,13 +24,28 @@ public class RequestHandler {
     @Value("${paths.upload}")
     private String uploadPath;
 
-    private ResourceLoader resourceLoader;
     private FileRepository fileRepository;
 
     @Autowired
-    public RequestHandler(ResourceLoader resourceLoader, FileRepository fileRepository) {
-        this.resourceLoader = resourceLoader;
+    public RequestHandler(FileRepository fileRepository) {
         this.fileRepository = fileRepository;
+    }
+
+    @GetMapping("/")
+    public String home(Model model) throws IOException {
+        model.addAttribute("files", fileRepository.getFileNames());
+        model.addAttribute("message", "Hello World!");
+        return "index";
+    }
+
+    @GetMapping(value = "/tagcloud/{filename}", produces = MediaType.IMAGE_JPEG_VALUE)
+    public Resource getTagcloud(@PathVariable("filename") String filename) {
+        return this.fileRepository.getTagcloud(filename);
+    }
+
+    @GetMapping(value = "/tagcloud/global", produces = MediaType.IMAGE_JPEG_VALUE)
+    public Resource getTagcloud() {
+        return this.fileRepository.getGlobalTagcloud();
     }
 
     @PostMapping("/uploadFile")
@@ -37,11 +54,9 @@ public class RequestHandler {
         fileRepository.saveMultipart(multipartFile);
     }
 
-    @GetMapping("/")
-    public ModelAndView home() throws IOException {
-        ModelAndView model = new ModelAndView("index");
-        model.addObject("files", fileRepository.getFileNames());
-        return model;
+    @PostMapping("/makeGlobal")
+    public void makeGlobalTagcloud() {
+        // TODO
     }
 
     @ExceptionHandler(IOException.class)
