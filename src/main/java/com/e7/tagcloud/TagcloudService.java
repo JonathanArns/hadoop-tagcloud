@@ -41,7 +41,23 @@ public class TagcloudService {
         BasicConfigurator.configure();
         Configuration cfg = new Configuration();
 
-        Job job = Job.getInstance(cfg, "tagcloud");
+        Job job = Job.getInstance(conf, "word count");
+        job.setJarByClass(WordCount.class);
+        job.setMapperClass(TokenizerMapper.class);
+        job.setCombinerClass(IntSumReducer.class);
+        job.setReducerClass(IntSumReducer.class);
+        job.setNumReduceTasks(4);
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(IntWritable.class);
+
+        job.setOutputFormatClass(SequenceFileOutputFormat.class);
+
+        FileInputFormat.addInputPath(job, new Path("resources/klassiker/*.txt"));
+        FileOutputFormat.setOutputPath(job, new Path("/tmp/wc-output"));
+
+        job.waitForCompletion(true);
+
+        job = Job.getInstance(cfg, "tagcloud");
         job.setJarByClass(Tokenizer.class);
         job.setMapperClass(Mapper.class);
         job.setReducerClass(Reducer.class);
@@ -60,3 +76,4 @@ public class TagcloudService {
         job.waitForCompletion(true);
     }
 }
+
