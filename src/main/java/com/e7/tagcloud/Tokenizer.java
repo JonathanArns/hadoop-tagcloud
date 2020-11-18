@@ -20,16 +20,16 @@ import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.reduce.IntSumReducer;
 import org.apache.log4j.BasicConfigurator;
 
-public static class Tokenizer extends Mapper<Object, Text, Text, IntWritable>{
+public class Tokenizer extends Mapper<Object, Text, Text, IntWritable>{
     private final static IntWritable _intWr = new IntWritable();
     private Text txt = new Text();
 
-    public void map(Object key, Text val, Context, ctx) throws IOException, InterruptedException {
+    public void map(Object key, Text val, Context ctx) throws IOException, InterruptedException {
 
-        Pattern p = Patter.compile("(\\b[^\\s]+\\b");
+        Pattern p = Pattern.compile("(\\b[^\\s]+\\b)");
         Matcher m = p.matcher(val.toString());
-        while(matcher.find()) {
-            txt.set(val.toString().subString(matcher.start(), matcher.end()).toLowerCase());
+        while(m.find()) {
+            txt.set(val.toString().substring(m.start(), m.end()).toLowerCase());
             ctx.write(txt, _intWr);
         }
     }

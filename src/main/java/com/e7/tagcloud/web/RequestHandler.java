@@ -1,6 +1,7 @@
 package com.e7.tagcloud.web;
 
 import com.e7.tagcloud.FileRepository;
+import com.e7.tagcloud.TagcloudService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -25,10 +26,12 @@ public class RequestHandler {
     private String uploadPath;
 
     private FileRepository fileRepository;
+    private TagcloudService tagcloudService;
 
     @Autowired
-    public RequestHandler(FileRepository fileRepository) {
+    public RequestHandler(FileRepository fileRepository, TagcloudService tagcloudService) {
         this.fileRepository = fileRepository;
+        this.tagcloudService = tagcloudService;
     }
 
     @GetMapping("/")
@@ -50,7 +53,7 @@ public class RequestHandler {
 
     @PostMapping("/uploadFile")
     @ResponseStatus(value = HttpStatus.OK)
-    public void uploadFile(@RequestParam("file") MultipartFile multipartFile) throws IOException {
+    public void uploadFile(@RequestParam("file") MultipartFile multipartFile) throws IOException, ClassNotFoundException, InterruptedException {
         fileRepository.saveMultipart(multipartFile);
     }
 

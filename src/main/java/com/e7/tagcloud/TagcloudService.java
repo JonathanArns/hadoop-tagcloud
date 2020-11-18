@@ -15,23 +15,34 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.reduce.IntSumReducer;
 import org.apache.log4j.BasicConfigurator;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
-public class JobWrapper {
-    private Job job;
-    public JobWrapper(){}
-
-    public void Call(String inputPath, String outputPath) throws Exception { // not sure what it will throw b now :D
-        BasicConfigurator.configure();
+@Service
+public class TagcloudService {
+    static {
         System.setProperty("hadoop.home.dir", "/");
+    }
 
+    @Value("${paths.upload}")
+    private String uploadPath;
+
+    @Value("${paths.tagclouds}")
+    private String tagcloudPath;
+
+//    private Job job;
+
+    public void makeTagcloud(String name) throws IOException, ClassNotFoundException, InterruptedException { // not sure what it will throw b now :D
+        BasicConfigurator.configure();
         Configuration cfg = new Configuration();
 
-        job = Job.getInstance(cfg, "freq sort");
-        job.setJarByClass(WordCountJob.class);
+        Job job = Job.getInstance(cfg, "tagcloud");
+        job.setJarByClass(Tokenizer.class);
         job.setMapperClass(Mapper.class);
         job.setReducerClass(Reducer.class);
         job.setOutputKeyClass(IntWritable.class);
@@ -39,12 +50,13 @@ public class JobWrapper {
 
         job.setNumReduceTasks(2);
 
-        job.setSortComparatorClass(MyDescendingComparator.class);
-        job.setInputFormatClass(SequenceFileInputFormat.class);
+//        job.setSortComparatorClass(MyDescendingComparator.class);
+//        job.setInputFormatClass(SequenceFileInputFormat.class);
+        job.setInputFormatClass(TextInputFormat.class);
 
-        FileInputFormat.addInputPath(job, new Path(inputPath));
-        FileOutputFormat.setOutputPath(job, new Path(outputPath));
+        FileInputFormat.addInputPath(job, new Path(uploadPath + name));
+        FileOutputFormat.setOutputPath(job, new Path(tagcloudPath + name));
 
-        System.exit(job.waitForCompletion(true) ? 0 : 1);
+        job.waitForCompletion(true);
     }
 }

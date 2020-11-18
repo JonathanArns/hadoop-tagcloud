@@ -24,19 +24,21 @@ public class FileRepository {
     private String globalTagcloudPath;
 
     private ResourceLoader resourceLoader;
+    private TagcloudService tagcloudService;
 
     @Autowired
-    public FileRepository(ResourceLoader resourceLoader) {
+    public FileRepository(ResourceLoader resourceLoader, TagcloudService tagcloudService) {
         this.resourceLoader = resourceLoader;
+        this.tagcloudService = tagcloudService;
     }
 
-    public void saveMultipart(MultipartFile multipartFile) throws IOException {
-        String fileName = multipartFile.getOriginalFilename() + "_" + System.currentTimeMillis();
-        File file = new File("/tmp/" + uploadPath + fileName);
-        file.getParentFile().mkdirs();
+    public void saveMultipart(MultipartFile multipartFile) throws IOException, InterruptedException, ClassNotFoundException {
+        String fileName = System.currentTimeMillis() + "_" + multipartFile.getOriginalFilename();
+        File file = new File(uploadPath + fileName);
+        file.mkdirs();
         file.createNewFile();
         multipartFile.transferTo(file);
-        System.out.println(uploadPath + fileName);
+        tagcloudService.makeTagcloud(fileName);
     }
 
     public List<String> getFileNames() throws IOException {
