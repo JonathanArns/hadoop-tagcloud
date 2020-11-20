@@ -1,4 +1,4 @@
-package com.e7.tagcloud;
+package com.e7.tagcloud.hadoop;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -21,7 +21,7 @@ import org.apache.hadoop.mapreduce.lib.reduce.IntSumReducer;
 import org.apache.log4j.BasicConfigurator;
 
 public class Tokenizer extends Mapper<Object, Text, Text, IntWritable>{
-    private final static IntWritable _intWr = new IntWritable();
+    private final static IntWritable _intWr = new IntWritable(1);
     private Text txt = new Text();
 
     public void map(Object key, Text val, Context ctx) throws IOException, InterruptedException {

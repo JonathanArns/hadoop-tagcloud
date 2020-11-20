@@ -17,7 +17,7 @@
 <div>
     <ul>
         <li th:each="file : ${files}">
-            <a th:href="${file}" th:text="${file}" />
+            <a th:href="@{/tagcloud/{filename}(filename=${file.key})}" th:text="${file.value}" />
         </li>
     </ul>
 </div>

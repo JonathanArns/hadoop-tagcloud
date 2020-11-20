@@ -1,4 +1,4 @@
-package com.e7.tagcloud;
+package com.e7.tagcloud.hadoop;
 
 import java.io.IOException;
 
