@@ -1,4 +1,4 @@
-package com.e7.tagcloud;
+package com.e7.tagcloud.util;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

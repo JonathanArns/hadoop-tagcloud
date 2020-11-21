@@ -1,7 +1,8 @@
 package com.e7.tagcloud.web;
 
-import com.e7.tagcloud.FileService;
-import com.e7.tagcloud.TagcloudService;
+import com.e7.tagcloud.util.FileService;
+import com.e7.tagcloud.processing.TagcloudService;
+import com.e7.tagcloud.processing.speed.SpeedService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -11,9 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 @Controller
@@ -24,11 +23,13 @@ public class TagcloudController {
 
     private FileService fileService;
     private TagcloudService tagcloudService;
+    private SpeedService speedService;
 
     @Autowired
-    public TagcloudController(FileService fileService, TagcloudService tagcloudService) {
+    public TagcloudController(FileService fileService, TagcloudService tagcloudService, SpeedService speedService) {
         this.fileService = fileService;
         this.tagcloudService = tagcloudService;
+        this.speedService = speedService;
     }
 
     @GetMapping("/")
@@ -53,7 +54,8 @@ public class TagcloudController {
     @PostMapping("/uploadFile")
     @ResponseStatus(value = HttpStatus.OK)
     public void uploadFile(@RequestParam("file") MultipartFile multipartFile) throws IOException, ClassNotFoundException, InterruptedException {
-        fileService.saveMultipart(multipartFile);
+        String fileName = fileService.saveMultipart(multipartFile);
+        speedService.createTagcloud(fileName);
     }
 
     @PostMapping("/makeGlobal")

@@ -1,7 +1,7 @@
-package com.e7.tagcloud;
+package com.e7.tagcloud.util;
 
+import com.e7.tagcloud.util.Paths;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternUtils;
@@ -10,9 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -20,22 +18,20 @@ public class FileService {
 
     private Paths paths;
     private ResourceLoader resourceLoader;
-    private TagcloudService tagcloudService;
 
     @Autowired
-    public FileService(Paths paths, ResourceLoader resourceLoader, TagcloudService tagcloudService) {
+    public FileService(Paths paths, ResourceLoader resourceLoader) {
         this.paths = paths;
         this.resourceLoader = resourceLoader;
-        this.tagcloudService = tagcloudService;
     }
 
-    public void saveMultipart(MultipartFile multipartFile) throws IOException, InterruptedException, ClassNotFoundException {
+    public String saveMultipart(MultipartFile multipartFile) throws IOException, InterruptedException, ClassNotFoundException {
         String fileName = System.currentTimeMillis() + "_" + multipartFile.getOriginalFilename();
         File file = new File(paths.getUpload() + fileName);
         file.mkdirs();
         file.createNewFile();
         multipartFile.transferTo(file);
-        tagcloudService.makeWordCount(fileName);
+        return fileName;
     }
 
     public Map<String, String> getFileNames() throws IOException {

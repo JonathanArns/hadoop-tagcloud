@@ -1,4 +1,4 @@
-package com.e7.tagcloud;
+package com.e7.tagcloud.processing;
 
 import java.awt.*;
 import java.io.File;
@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.e7.tagcloud.hadoop.Tokenizer;
-import com.e7.tagcloud.hadoop.WordCountReducer;
+import com.e7.tagcloud.util.Paths;
+import com.e7.tagcloud.TagcloudApplication;
+import com.e7.tagcloud.processing.batch.WordCountMapper;
+import com.e7.tagcloud.processing.batch.WordCountReducer;
 import com.kennycason.kumo.CollisionMode;
 import com.kennycason.kumo.WordCloud;
 import com.kennycason.kumo.WordFrequency;
@@ -49,7 +51,7 @@ public class TagcloudService {
 
         Job wordCountJob = Job.getInstance(cfg, "word count");
         wordCountJob.setJarByClass(TagcloudApplication.class);
-        wordCountJob.setMapperClass(Tokenizer.class);
+        wordCountJob.setMapperClass(WordCountMapper.class);
         wordCountJob.setCombinerClass(IntSumReducer.class);
         wordCountJob.setReducerClass(WordCountReducer.class);
         wordCountJob.setNumReduceTasks(2);
@@ -62,7 +64,6 @@ public class TagcloudService {
         FileOutputFormat.setOutputPath(wordCountJob, new Path(paths.getWordcounts() + name));
 
         wordCountJob.waitForCompletion(true);
-        makeTagcloud(name);
 
 //        job = Job.getInstance(cfg, "tagcloud");
 //        job.setJarByClass(TagcloudApplication.class);
@@ -83,7 +84,7 @@ public class TagcloudService {
 //        job.waitForCompletion(true);
     }
 
-    public void makeTagcloud(String name) throws IOException {
+    public void makeTagcloudByName(String name) throws IOException {
         final FrequencyFileLoader frequencyFileLoader = new FrequencyFileLoader();
         List<File> wordCountFiles = getWordCountFiles(name);
         List<WordFrequency> wordFrequencies = new ArrayList<>();
@@ -100,6 +101,19 @@ public class TagcloudService {
         wordCloud.setFontScalar(new SqrtFontScalar(10, 40));
         wordCloud.build(wordFrequencies);
         File outputFile = new File(paths.getTagclouds() + name + ".png");
+        outputFile.getParentFile().mkdirs();
+        outputFile.createNewFile();
+        wordCloud.writeToFile(outputFile.getAbsolutePath());
+    }
+
+    public void makeTagcloud(List<WordFrequency> wordFrequencies, File outputFile) throws IOException {
+        final Dimension dimension = new Dimension(600, 600);
+        final WordCloud wordCloud = new WordCloud(dimension, CollisionMode.PIXEL_PERFECT);
+        wordCloud.setPadding(2);
+        wordCloud.setBackground(new CircleBackground(300));
+        wordCloud.setColorPalette(new ColorPalette(new Color(0x4055F1), new Color(0x408DF1), new Color(0x40AAF1), new Color(0x40C5F1), new Color(0x40D3F1), new Color(0xFFFFFF)));
+        wordCloud.setFontScalar(new SqrtFontScalar(10, 40));
+        wordCloud.build(wordFrequencies);
         outputFile.getParentFile().mkdirs();
         outputFile.createNewFile();
         wordCloud.writeToFile(outputFile.getAbsolutePath());
