@@ -27,11 +27,12 @@ public class BatchService {
         Configuration conf = new Configuration();
 
         // Job: WordCount /////////////////////////////////////////////////////
+        // word@filename : count
         Job wordCountJob = Job.getInstance(conf, "word count");
         wordCountJob.setJarByClass(TagcloudApplication.class);
         wordCountJob.setMapperClass(WordCountMapper.class);
         wordCountJob.setCombinerClass(IntSumReducer.class);
-        wordCountJob.setReducerClass(WordCountReducer.class);
+        wordCountJob.setReducerClass(IntSumReducer.class);
         wordCountJob.setNumReduceTasks(2);
         wordCountJob.setOutputKeyClass(Text.class);
         wordCountJob.setOutputValueClass(IntWritable.class);
@@ -43,6 +44,7 @@ public class BatchService {
         ///////////////////////////////////////////////////////////////////////
 
         // Job: WordCount per docs ////////////////////////////////////////////
+        // word@filename : count/file_total
         Job wordDocJob = Job.getInstance(conf, "word count per doc");
         wordDocJob.setJarByClass(TagcloudApplication.class);
         wordDocJob.setMapperClass(WordCountMapper.class);
@@ -56,6 +58,12 @@ public class BatchService {
         FileOutputFormat.setOutputPath(wordCountJob, new Path(paths.getWordcounts() + name));
 
         wordCountJob.waitForCompletion(true);
+
+
+
+
+        // last job output format in text file:
+        // count: word
 
     }
 }
