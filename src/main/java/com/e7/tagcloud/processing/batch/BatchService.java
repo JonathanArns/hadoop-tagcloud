@@ -23,9 +23,10 @@ public class BatchService {
     @Autowired
     Paths paths;
 
-    public run() throws IOException, ClassNotFoundException, InterruptedException {
+    public void run() throws IOException, ClassNotFoundException, InterruptedException {
         Configuration conf = new Configuration();
 
+        // Job: WordCount /////////////////////////////////////////////////////
         Job wordCountJob = Job.getInstance(conf, "word count");
         wordCountJob.setJarByClass(TagcloudApplication.class);
         wordCountJob.setMapperClass(WordCountMapper.class);
@@ -35,7 +36,21 @@ public class BatchService {
         wordCountJob.setOutputKeyClass(Text.class);
         wordCountJob.setOutputValueClass(IntWritable.class);
 
-//        job.setOutputFormatClass(SequenceFileOutputFormat.class);
+        FileInputFormat.addInputPath(wordCountJob, new Path(paths.getUpload() + name));
+        FileOutputFormat.setOutputPath(wordCountJob, new Path(paths.getWordcounts() + name));
+
+        wordCountJob.waitForCompletion(true);
+        ///////////////////////////////////////////////////////////////////////
+
+        // Job: WordCount per docs ////////////////////////////////////////////
+        Job wordDocJob = Job.getInstance(conf, "word count per doc");
+        wordDocJob.setJarByClass(TagcloudApplication.class);
+        wordDocJob.setMapperClass(WordCountMapper.class);
+        wordDocJob.setCombinerClass(IntSumReducer.class);
+        wordDocJob.setReducerClass(WordCountReducer.class);
+        wordDocJob.setNumReduceTasks(2);
+        wordDocJob.setOutputKeyClass(Text.class);
+        wordDocJob.setOutputValueClass(IntWritable.class);
 
         FileInputFormat.addInputPath(wordCountJob, new Path(paths.getUpload() + name));
         FileOutputFormat.setOutputPath(wordCountJob, new Path(paths.getWordcounts() + name));
