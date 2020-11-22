@@ -72,7 +72,7 @@ public class BatchService {
 
         // Job: TF-IDF ////////////////////////////////////////////////////////
         Configuration conf3 = new Configuration();
-        conf3.setStrings("docscound", ""+docsCount);
+        conf3.setStrings("docscount", ""+docsCount);
         Job tfidfJob = Job.getInstance(conf3, "tf-idf job");
         tfidfJob.setMapperClass(TFIDFMapper.class);
         tfidfJob.setReducerClass(TFIDFReducer.class);

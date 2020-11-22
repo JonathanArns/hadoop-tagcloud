@@ -23,7 +23,7 @@ public class TFIDFReducer extends Reducer<Text, Text, Text, Text> {
             InterruptedException {
 
         // get the number of documents indirectly from the file-system
-        int numberOfDocumentsInCorpus = context.getConfiguration().getInt("docscound", 1);
+        int numberOfDocumentsInCorpus = context.getConfiguration().getInt("docscount", 1);
         // total frequency of this word
         int numberOfDocumentsInCorpusWhereKeyAppears = 0;
         Map<String, String> tempFrequencies = new HashMap<String, String>();
