@@ -44,10 +44,9 @@ public class BatchService {
 
         // Job: WordCount per docs ////////////////////////////////////////////
         Job wordDocJob = Job.getInstance(conf, "word count per doc");
-        wordDocJob.setJarByClass(TagcloudApplication.class);
-        wordDocJob.setMapperClass(WordCountMapper.class);
+        wordDocJob.setMapperClass(WordCountInDocMapper.class);
         wordDocJob.setCombinerClass(IntSumReducer.class);
-        wordDocJob.setReducerClass(WordCountReducer.class);
+        wordDocJob.setReducerClass(WordCountInDocReducer.class);
         wordDocJob.setNumReduceTasks(2);
         wordDocJob.setOutputKeyClass(Text.class);
         wordDocJob.setOutputValueClass(IntWritable.class);
@@ -55,7 +54,21 @@ public class BatchService {
         FileInputFormat.addInputPath(wordCountJob, new Path(paths.getUpload() + name));
         FileOutputFormat.setOutputPath(wordCountJob, new Path(paths.getWordcounts() + name));
 
-        wordCountJob.waitForCompletion(true);
+        wordDocJob.waitForCompletion(true);
+
+        // Job: TF-IDF ////////////////////////////////////////////////////////
+        Job tfidfJob = Job.getInstance(conf, "tf-idf job");
+        tfidfJob.setMapperClass(TFIDFMapper.class);
+        tfidfJob.setCombinerClass(IntSumReducer.class);
+        tfidfJob.setReducerClass(TFIDFReducer.class);
+        tfidfJob.setNumReduceTasks(2);
+        tfidfJob.setOutputKeyClass(Text.class);
+        tfidfJob.setOutputValueClass(IntWritable.class);
+
+        FileInputFormat.addInputPath(wordCountJob, new Path(paths.getUpload() + name));
+        FileOutputFormat.setOutputPath(wordCountJob, new Path(paths.getWordcounts() + name));
+
+        tfidfJob.waitForCompletion(true);
 
     }
 }
