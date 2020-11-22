@@ -7,21 +7,22 @@ import java.util.regex.Pattern;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapred.FileSplit;
 import org.apache.hadoop.mapreduce.Mapper;
 
-public class TFIDFMapper extends Mapper<LongWritable, Text, Text, Text> {
+public class TFIDFMapper extends Mapper<Text, Text, Text, Text> {
     public TFIDFMapper() {
     }
 
     private Text wordAndDoc = new Text();
     private Text wordAndCounters = new Text();
 
-    public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-        String[] wordAndCounters = value.toString().split("\t");
-        String[] wordAndDoc = wordAndCounters[0].split("@");
+    public void map(Text key, Text value, Context context) throws IOException, InterruptedException {
+        System.out.println(key.toString() + "   |   " + value.toString());
+        String[] wordAndDoc = key.toString().split("@");
         this.wordAndDoc.set(new Text(wordAndDoc[0]));
-        this.wordAndCounters.set(wordAndDoc[1] + "=" + wordAndCounters[1]);
+        this.wordAndCounters.set(wordAndDoc[1] + "=" + value.toString());
         context.write(this.wordAndDoc, this.wordAndCounters);
     }
 }

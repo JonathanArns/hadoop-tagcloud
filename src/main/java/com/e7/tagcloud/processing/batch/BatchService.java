@@ -9,7 +9,9 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.reduce.IntSumReducer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,12 +26,12 @@ public class BatchService {
     Paths paths;
 
     public void run() throws IOException, ClassNotFoundException, InterruptedException {
-        Configuration conf = new Configuration();
         long timestamp = System.currentTimeMillis();
 
         // Job: WordCount /////////////////////////////////////////////////////
         // word@filename : count
-        Job wordCountJob = Job.getInstance(conf, "word count");
+        Configuration conf1 = new Configuration();
+        Job wordCountJob = Job.getInstance(conf1, "word count");
         wordCountJob.setJarByClass(TagcloudApplication.class);
         wordCountJob.setMapperClass(WordCountMapper.class);
         wordCountJob.setCombinerClass(IntSumReducer.class);
@@ -38,6 +40,7 @@ public class BatchService {
         wordCountJob.setOutputKeyClass(Text.class);
         wordCountJob.setOutputValueClass(IntWritable.class);
 
+        wordCountJob.setOutputFormatClass(SequenceFileOutputFormat.class);
         FileInputFormat.addInputPath(wordCountJob, new Path(paths.getUpload()));
         FileOutputFormat.setOutputPath(wordCountJob, new Path(paths.getJob1() + timestamp));
 
@@ -46,30 +49,35 @@ public class BatchService {
 
         // Job: WordCount per docs ////////////////////////////////////////////
         // word@filename : count/file_total
-        Job wordDocJob = Job.getInstance(conf, "word count per doc");
+        Configuration conf2 = new Configuration();
+        Job wordDocJob = Job.getInstance(conf2, "word count per doc");
         wordDocJob.setMapperClass(WordCountInDocMapper.class);
-        wordDocJob.setCombinerClass(IntSumReducer.class);
+//        wordDocJob.setCombinerClass(IntSumReducer.class);
         wordDocJob.setReducerClass(WordCountInDocReducer.class);
         wordDocJob.setNumReduceTasks(2);
         wordDocJob.setOutputKeyClass(Text.class);
-        wordDocJob.setOutputValueClass(IntWritable.class);
+        wordDocJob.setOutputValueClass(Text.class);
 
-        FileInputFormat.addInputPath(wordCountJob, new Path(paths.getJob1() + timestamp));
-        FileOutputFormat.setOutputPath(wordCountJob, new Path(paths.getJob2() + timestamp));
+        wordDocJob.setInputFormatClass(SequenceFileInputFormat.class);
+        wordDocJob.setOutputFormatClass(SequenceFileOutputFormat.class);
+        FileInputFormat.addInputPath(wordDocJob, new Path(paths.getJob1() + timestamp));
+        FileOutputFormat.setOutputPath(wordDocJob, new Path(paths.getJob2() + timestamp));
 
         wordDocJob.waitForCompletion(true);
 
         // Job: TF-IDF ////////////////////////////////////////////////////////
-        Job tfidfJob = Job.getInstance(conf, "tf-idf job");
+        Configuration conf3 = new Configuration();
+        Job tfidfJob = Job.getInstance(conf3, "tf-idf job");
         tfidfJob.setMapperClass(TFIDFMapper.class);
-        tfidfJob.setCombinerClass(IntSumReducer.class);
+//        tfidfJob.setCombinerClass(IntSumReducer.class);
         tfidfJob.setReducerClass(TFIDFReducer.class);
         tfidfJob.setNumReduceTasks(2);
         tfidfJob.setOutputKeyClass(Text.class);
-        tfidfJob.setOutputValueClass(IntWritable.class);
+        tfidfJob.setOutputValueClass(Text.class);
 
-        FileInputFormat.addInputPath(wordCountJob, new Path(paths.getJob2() + timestamp));
-        FileOutputFormat.setOutputPath(wordCountJob, new Path(paths.getJob3() + timestamp));
+        tfidfJob.setInputFormatClass(SequenceFileInputFormat.class);
+        FileInputFormat.addInputPath(tfidfJob, new Path(paths.getJob2() + timestamp));
+        FileOutputFormat.setOutputPath(tfidfJob, new Path(paths.getJob3() + timestamp));
 
         tfidfJob.waitForCompletion(true);
 

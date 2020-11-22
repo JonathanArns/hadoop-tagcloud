@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 // word=#
-public class WordCountInDocReducer extends Reducer<Text, IntWritable,Text,Text> {
+public class WordCountInDocReducer extends Reducer<Text, IntWritable, Text, Text> {
 
     public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 

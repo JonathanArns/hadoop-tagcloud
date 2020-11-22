@@ -1,5 +1,6 @@
 package com.e7.tagcloud.web;
 
+import com.e7.tagcloud.processing.batch.BatchService;
 import com.e7.tagcloud.util.FileService;
 import com.e7.tagcloud.processing.TagcloudService;
 import com.e7.tagcloud.processing.speed.SpeedService;
@@ -24,11 +25,13 @@ public class TagcloudController {
     private FileService fileService;
     private TagcloudService tagcloudService;
     private SpeedService speedService;
+    private BatchService batchService;
 
     @Autowired
-    public TagcloudController(FileService fileService, TagcloudService tagcloudService, SpeedService speedService) {
+    public TagcloudController(FileService fileService, TagcloudService tagcloudService, SpeedService speedService, BatchService batchService) {
         this.fileService = fileService;
         this.tagcloudService = tagcloudService;
+        this.batchService = batchService;
         this.speedService = speedService;
     }
 
@@ -59,8 +62,8 @@ public class TagcloudController {
     }
 
     @PostMapping("/makeGlobal")
-    public void makeGlobalTagcloud() {
-        // TODO
+    public void makeGlobalTagcloud() throws InterruptedException, IOException, ClassNotFoundException {
+        batchService.run();
     }
 
 //    @ExceptionHandler(FileNotFoundException.class)
