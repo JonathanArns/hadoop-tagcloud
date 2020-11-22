@@ -99,7 +99,12 @@ public class BatchService {
         // tag cloud per doc
         Map<String, List<WordFrequency>> freqs = getWordFreq(getWordCountFiles(""+timestamp));
         for (String key : freqs.keySet()) {
-            tagcloudService.makeTagcloud(freqs.get(key), new File(paths.getTagclouds()+ key+"out.png"));
+            File outputFile;
+            if (key.equals("global"))
+                outputFile = new File(paths.getGlobalTagcloud());
+            else
+                outputFile = new File(paths.getTagclouds() + key + "out.png");
+            tagcloudService.makeTagcloud(freqs.get(key), outputFile);
         }
 
     }
