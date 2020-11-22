@@ -4,6 +4,8 @@ import com.e7.tagcloud.TagcloudApplication;
 import com.e7.tagcloud.processing.TagcloudService;
 import com.e7.tagcloud.util.Paths;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -27,10 +29,13 @@ public class BatchService {
 
     public void run() throws IOException, ClassNotFoundException, InterruptedException {
         long timestamp = System.currentTimeMillis();
-
+        Configuration conf1 = new Configuration();
+        FileSystem fs = FileSystem.get(conf1);
+        // get doc count
+         int docsCount = fs.listStatus(new Path(paths.getUpload())).length;
         // Job: WordCount /////////////////////////////////////////////////////
         // word@filename : count
-        Configuration conf1 = new Configuration();
+
         Job wordCountJob = Job.getInstance(conf1, "word count");
         wordCountJob.setJarByClass(TagcloudApplication.class);
         wordCountJob.setMapperClass(WordCountMapper.class);
@@ -67,9 +72,9 @@ public class BatchService {
 
         // Job: TF-IDF ////////////////////////////////////////////////////////
         Configuration conf3 = new Configuration();
+        conf3.setStrings("docscound", ""+docsCount);
         Job tfidfJob = Job.getInstance(conf3, "tf-idf job");
         tfidfJob.setMapperClass(TFIDFMapper.class);
-//        tfidfJob.setCombinerClass(IntSumReducer.class);
         tfidfJob.setReducerClass(TFIDFReducer.class);
         tfidfJob.setNumReduceTasks(2);
         tfidfJob.setOutputKeyClass(Text.class);

@@ -15,6 +15,7 @@ public class WordCountInDocMapper extends Mapper<Text, IntWritable, Text, Text>{
             String[] wordDoc = key.toString().split("@");
             this.docName.set(wordDoc[1]);
             this.wordAndCount.set(wordDoc[0] + "=" + value.get());
+            System.out.println("2 Mapper:" + this.wordAndCount);
             context.write(this.docName, this.wordAndCount);
     }
 }
