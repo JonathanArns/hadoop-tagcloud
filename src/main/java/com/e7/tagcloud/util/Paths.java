@@ -13,6 +13,34 @@ public class Paths {
     private String globalTagcloud;
     private String wordcounts;
 
+    private String job1;
+    private String job2;
+    private String job3;
+
+    public String getJob1() {
+        return job1;
+    }
+
+    public void setJob1(String job1) {
+        this.job1 = job1;
+    }
+
+    public String getJob2() {
+        return job2;
+    }
+
+    public void setJob2(String job2) {
+        this.job2 = job2;
+    }
+
+    public String getJob3() {
+        return job3;
+    }
+
+    public void setJob3(String job3) {
+        this.job3 = job3;
+    }
+
     public String getUpload() {
         return upload;
     }

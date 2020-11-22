@@ -25,24 +25,27 @@ public class BatchService {
 
     public void run() throws IOException, ClassNotFoundException, InterruptedException {
         Configuration conf = new Configuration();
+        long timestamp = System.currentTimeMillis();
 
         // Job: WordCount /////////////////////////////////////////////////////
+        // word@filename : count
         Job wordCountJob = Job.getInstance(conf, "word count");
         wordCountJob.setJarByClass(TagcloudApplication.class);
         wordCountJob.setMapperClass(WordCountMapper.class);
         wordCountJob.setCombinerClass(IntSumReducer.class);
-        wordCountJob.setReducerClass(WordCountReducer.class);
+        wordCountJob.setReducerClass(IntSumReducer.class);
         wordCountJob.setNumReduceTasks(2);
         wordCountJob.setOutputKeyClass(Text.class);
         wordCountJob.setOutputValueClass(IntWritable.class);
 
-        FileInputFormat.addInputPath(wordCountJob, new Path(paths.getUpload() + name));
-        FileOutputFormat.setOutputPath(wordCountJob, new Path(paths.getWordcounts() + name));
+        FileInputFormat.addInputPath(wordCountJob, new Path(paths.getUpload()));
+        FileOutputFormat.setOutputPath(wordCountJob, new Path(paths.getJob1() + timestamp));
 
         wordCountJob.waitForCompletion(true);
         ///////////////////////////////////////////////////////////////////////
 
         // Job: WordCount per docs ////////////////////////////////////////////
+        // word@filename : count/file_total
         Job wordDocJob = Job.getInstance(conf, "word count per doc");
         wordDocJob.setMapperClass(WordCountInDocMapper.class);
         wordDocJob.setCombinerClass(IntSumReducer.class);
@@ -51,8 +54,8 @@ public class BatchService {
         wordDocJob.setOutputKeyClass(Text.class);
         wordDocJob.setOutputValueClass(IntWritable.class);
 
-        FileInputFormat.addInputPath(wordCountJob, new Path(paths.getUpload() + name));
-        FileOutputFormat.setOutputPath(wordCountJob, new Path(paths.getWordcounts() + name));
+        FileInputFormat.addInputPath(wordCountJob, new Path(paths.getJob1() + timestamp));
+        FileOutputFormat.setOutputPath(wordCountJob, new Path(paths.getJob2() + timestamp));
 
         wordDocJob.waitForCompletion(true);
 
@@ -69,6 +72,12 @@ public class BatchService {
         FileOutputFormat.setOutputPath(wordCountJob, new Path(paths.getWordcounts() + name));
 
         tfidfJob.waitForCompletion(true);
+
+
+
+
+        // last job output format in text file:
+        // count: word
 
     }
 }
