@@ -12,7 +12,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 public class WordCountMapper extends Mapper<Object, Text, Text, IntWritable>{
     private final static IntWritable _intWr = new IntWritable(1);
     private Text txt = new Text();
-
+    private Text txt2 = new Text();
     public void map(Object key, Text val, Context ctx) throws IOException, InterruptedException {
         String fileName = "@-_-@" + ((FileSplit) ctx.getInputSplit()).getPath().getName();
 
@@ -21,6 +21,9 @@ public class WordCountMapper extends Mapper<Object, Text, Text, IntWritable>{
         while(m.find()) {
             txt.set(val.toString().substring(m.start(), m.end()).toLowerCase() + fileName);
             ctx.write(txt, _intWr);
+
+            txt2.set(val.toString().substring(m.start(), m.end()).toLowerCase() + "@-_-@global");
+            ctx.write(txt2, _intWr);
         }
     }
 }

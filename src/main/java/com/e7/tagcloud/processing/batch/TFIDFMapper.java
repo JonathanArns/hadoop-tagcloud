@@ -15,13 +15,13 @@ public class TFIDFMapper extends Mapper<Text, Text, Text, Text> {
     public TFIDFMapper() {
     }
 
-    private Text wordAndDoc = new Text();
-    private Text wordAndCounters = new Text();
+    private Text word = new Text();
+    private Text docAndCounters = new Text();
 
     public void map(Text key, Text value, Context context) throws IOException, InterruptedException {
         String[] wordAndDoc = key.toString().split("@-_-@");
-        this.wordAndDoc.set(new Text(wordAndDoc[0]));
-        this.wordAndCounters.set(wordAndDoc[1] + "=" + value.toString());
-        context.write(this.wordAndDoc, this.wordAndCounters);
+        this.word.set(new Text(wordAndDoc[0]));
+        this.docAndCounters.set(wordAndDoc[1] + "=" + value.toString());
+        context.write(this.word, this.docAndCounters);
     }
 }

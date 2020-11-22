@@ -129,7 +129,7 @@ public class BatchService {
                     tmp = new ArrayList<>();
                     tfidfMap.put(word_doc[1], tmp);
                 }
-                tmp.add(new WordFrequency(word_doc[0], Integer.parseInt(tokens[1])));
+                tmp.add(new WordFrequency(word_doc[0], Integer.  parseInt(tokens[1])));
             }
         }
         return tfidfMap;
