@@ -29,10 +29,11 @@ public class TFIDFReducer extends Reducer<Text, Text, Text, Text> {
         Map<String, String> tempFrequencies = new HashMap<String, String>();
         for (Text val : values) {
             String[] documentAndFrequencies = val.toString().split("=");
+            tempFrequencies.put(documentAndFrequencies[0], documentAndFrequencies[1]);
             if (documentAndFrequencies[0].equals("global")) continue;
             if (Integer.parseInt(documentAndFrequencies[1].split("/")[0]) > 0)
                 numberOfDocumentsInCorpusWhereKeyAppears++;
-            tempFrequencies.put(documentAndFrequencies[0], documentAndFrequencies[1]);
+
         }
 
         // inverse document frequency quotient between the number of docs in corpus and number of docs the
