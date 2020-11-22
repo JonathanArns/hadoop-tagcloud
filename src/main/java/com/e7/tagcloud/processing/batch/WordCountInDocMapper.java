@@ -12,10 +12,9 @@ public class WordCountInDocMapper extends Mapper<Text, IntWritable, Text, Text>{
     private Text wordAndCount = new Text();
 
     public void map(Text key, IntWritable value, Context context) throws IOException, InterruptedException {
-            String[] wordDoc = key.toString().split("@");
+            String[] wordDoc = key.toString().split("@-_-@");
             this.docName.set(wordDoc[1]);
             this.wordAndCount.set(wordDoc[0] + "=" + value.get());
-            System.out.println("2 Mapper:" + this.wordAndCount);
             context.write(this.docName, this.wordAndCount);
     }
 }

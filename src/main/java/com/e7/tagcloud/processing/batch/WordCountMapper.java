@@ -14,7 +14,7 @@ public class WordCountMapper extends Mapper<Object, Text, Text, IntWritable>{
     private Text txt = new Text();
 
     public void map(Object key, Text val, Context ctx) throws IOException, InterruptedException {
-        String fileName = "@" + ((FileSplit) ctx.getInputSplit()).getPath().getName();
+        String fileName = "@-_-@" + ((FileSplit) ctx.getInputSplit()).getPath().getName();
 
         Pattern p = Pattern.compile("(\\b[^\\s]+\\b)");
         Matcher m = p.matcher(val.toString());

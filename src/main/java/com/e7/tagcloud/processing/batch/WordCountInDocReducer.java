@@ -13,8 +13,6 @@ public class WordCountInDocReducer extends Reducer<Text, Text, Text, Text> {
 
 
     protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-        System.out.println(key.toString());
-        System.out.println("Values:" + values);
         int sumOfAll = 0;
         Map<String, Integer> someMap = new HashMap<>();
         for (Text val : values) {
@@ -26,7 +24,7 @@ public class WordCountInDocReducer extends Reducer<Text, Text, Text, Text> {
 
         for(String wKey : someMap.keySet()) {
             Text ctxKey = new Text();
-            ctxKey.set(wKey + "@" + key.toString());
+            ctxKey.set(wKey + "@-_-@" + key.toString());
             System.out.println(ctxKey.toString());
             Text ctxVal = new Text();
             ctxVal.set(someMap.get(wKey) + "/" + sumOfAll);
