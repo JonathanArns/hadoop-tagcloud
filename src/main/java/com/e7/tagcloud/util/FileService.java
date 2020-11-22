@@ -44,6 +44,16 @@ public class FileService {
         return files;
     }
 
+    public Map<String, String> getTagcloudNames() throws IOException {
+        Map<String, String> files = getFileNames();
+        for (String name : files.keySet()) {
+            if (!hasTagcloud(name)) {
+                files.remove(name);
+            }
+        }
+        return files;
+    }
+
     public Resource getFile(String name) {
         return resourceLoader.getResource("file:" + paths.getUpload() + name);
     }
@@ -52,7 +62,15 @@ public class FileService {
         return resourceLoader.getResource("file:" + paths.getTagclouds() + name + ".png");
     }
 
+    public boolean hasTagcloud(String name) {
+        return new File(paths.getTagclouds() + name + ".png").exists();
+    }
+
     public Resource getGlobalTagcloud() {
         return resourceLoader.getResource("file:" + paths.getGlobalTagcloud());
+    }
+
+    public boolean hasGlobalTagcloud() {
+        return new File(paths.getGlobalTagcloud()).exists();
     }
 }

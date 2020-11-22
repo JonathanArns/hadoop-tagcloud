@@ -1,9 +1,7 @@
 <html xmlns:th="https://www.thymeleaf.org">
 <body>
 
-<div th:if="${message}">
-    <h2 th:text="${message}"></h2>
-</div>
+<h1>Tagclouds with Hadoop</h1>
 
 <div>
     <form method="POST" enctype="multipart/form-data" th:action="@{/uploadFile}">
@@ -18,9 +16,21 @@
 
 </div>
 <div>
+    <h4>Uploaded Files</h4>
     <ul>
         <li th:each="file : ${files}">
-            <a th:href="@{/tagcloud/{filename}(filename=${file.key})}" th:text="${file.value}" />
+            <a th:href="@{/files/{filename}(filename=${file.key})}" th:text="${file.value}" />
+        </li>
+    </ul>
+    <h4>Tagclouds:</h4>
+    <ul>
+        <li th:each="tagcloud : ${tagclouds}">
+            <a th:href="@{/tagcloud/{filename}(filename=${tagcloud.key})}" th:text="${tagcloud.value}" />
+        </li>
+    </ul>
+    <ul th:if="${global}">
+        <li>
+            <a th:href="@{/tagcloud/global}">Global Tagcloud</a>
         </li>
     </ul>
 </div>

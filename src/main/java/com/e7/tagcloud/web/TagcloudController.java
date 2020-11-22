@@ -19,27 +19,30 @@ import java.io.IOException;
 @Controller
 public class TagcloudController {
 
-    @Value("${paths.upload}")
-    private String uploadPath;
-
     private FileService fileService;
-    private TagcloudService tagcloudService;
     private SpeedService speedService;
     private BatchService batchService;
 
     @Autowired
-    public TagcloudController(FileService fileService, TagcloudService tagcloudService, SpeedService speedService, BatchService batchService) {
+    public TagcloudController(FileService fileService, SpeedService speedService, BatchService batchService) {
         this.fileService = fileService;
-        this.tagcloudService = tagcloudService;
         this.batchService = batchService;
         this.speedService = speedService;
     }
 
     @GetMapping("/")
     public String home(Model model) throws IOException {
+        model.addAttribute("tagclouds", fileService.getTagcloudNames());
         model.addAttribute("files", fileService.getFileNames());
-        model.addAttribute("message", "Hello World!");
+        if (fileService.hasGlobalTagcloud())
+            model.addAttribute("global", "flag");
         return "index";
+    }
+
+    @GetMapping(value = "/files/{filename}", produces = MediaType.TEXT_PLAIN_VALUE)
+    @ResponseBody
+    public Resource getFile(@PathVariable("filename") String filename) {
+        return this.fileService.getFile(filename);
     }
 
     @GetMapping(value = "/tagcloud/{filename}", produces = MediaType.IMAGE_PNG_VALUE)
@@ -55,15 +58,16 @@ public class TagcloudController {
     }
 
     @PostMapping("/uploadFile")
-    @ResponseStatus(value = HttpStatus.OK)
-    public void uploadFile(@RequestParam("file") MultipartFile multipartFile) throws IOException, ClassNotFoundException, InterruptedException {
+    public String uploadFile(@RequestParam("file") MultipartFile multipartFile) throws IOException, ClassNotFoundException, InterruptedException {
         String fileName = fileService.saveMultipart(multipartFile);
         speedService.createTagcloud(fileName);
+        return "redirect:/";
     }
 
     @PostMapping("/makeGlobal")
-    public void makeGlobalTagcloud() throws InterruptedException, IOException, ClassNotFoundException {
+    public String makeGlobalTagcloud() throws InterruptedException, IOException, ClassNotFoundException {
         batchService.run();
+        return "redirect:/";
     }
 
 //    @ExceptionHandler(FileNotFoundException.class)

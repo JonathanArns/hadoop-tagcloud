@@ -14,6 +14,7 @@ import com.kennycason.kumo.CollisionMode;
 import com.kennycason.kumo.WordCloud;
 import com.kennycason.kumo.WordFrequency;
 import com.kennycason.kumo.bg.CircleBackground;
+import com.kennycason.kumo.bg.RectangleBackground;
 import com.kennycason.kumo.font.scale.SqrtFontScalar;
 import com.kennycason.kumo.nlp.FrequencyFileLoader;
 import com.kennycason.kumo.palette.ColorPalette;
@@ -108,9 +109,9 @@ public class TagcloudService {
 
     public void makeTagcloud(List<WordFrequency> wordFrequencies, File outputFile) throws IOException {
         final Dimension dimension = new Dimension(600, 600);
-        final WordCloud wordCloud = new WordCloud(dimension, CollisionMode.PIXEL_PERFECT);
+        final WordCloud wordCloud = new WordCloud(dimension, CollisionMode.RECTANGLE);
         wordCloud.setPadding(2);
-        wordCloud.setBackground(new CircleBackground(300));
+        wordCloud.setBackground(new RectangleBackground(dimension));
         wordCloud.setColorPalette(new ColorPalette(new Color(0x4055F1), new Color(0x408DF1), new Color(0x40AAF1), new Color(0x40C5F1), new Color(0x40D3F1), new Color(0xFFFFFF)));
         wordCloud.setFontScalar(new SqrtFontScalar(5, 25));
         wordCloud.build(wordFrequencies);
