@@ -68,8 +68,8 @@ public class BatchService {
         tfidfJob.setOutputKeyClass(Text.class);
         tfidfJob.setOutputValueClass(IntWritable.class);
 
-        FileInputFormat.addInputPath(wordCountJob, new Path(paths.getUpload() + name));
-        FileOutputFormat.setOutputPath(wordCountJob, new Path(paths.getWordcounts() + name));
+        FileInputFormat.addInputPath(wordCountJob, new Path(paths.getJob2() + timestamp));
+        FileOutputFormat.setOutputPath(wordCountJob, new Path(paths.getJob3() + timestamp));
 
         tfidfJob.waitForCompletion(true);
 
