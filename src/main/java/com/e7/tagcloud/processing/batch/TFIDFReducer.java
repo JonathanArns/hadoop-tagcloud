@@ -49,12 +49,10 @@ public class TFIDFReducer extends Reducer<Text, Text, Text, Text> {
                     (double) ((numberOfDocumentsInCorpusWhereKeyAppears == 0 ? 1 : 0) +
                             numberOfDocumentsInCorpusWhereKeyAppears));
 
-            double tfIdf = tf * idf;
+            int tfIdf = (int) (tf * idf * 10000);
 
             this.wordAtDocument.set(key + "@" + document);
-            this.tfidfCounts.set("[" + numberOfDocumentsInCorpusWhereKeyAppears + "/"
-                    + numberOfDocumentsInCorpus + " , " + wordFrequenceAndTotalWords[0] + "/"
-                    + wordFrequenceAndTotalWords[1] + " , " + DF.format(tfIdf) + "]");
+            this.tfidfCounts.set(DF.format(tfIdf) + "");
 
             context.write(this.wordAtDocument, this.tfidfCounts);
         }

@@ -3,6 +3,8 @@ package com.e7.tagcloud.processing.batch;
 import com.e7.tagcloud.TagcloudApplication;
 import com.e7.tagcloud.processing.TagcloudService;
 import com.e7.tagcloud.util.Paths;
+import com.kennycason.kumo.Word;
+import com.kennycason.kumo.WordFrequency;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -16,14 +18,21 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.reduce.IntSumReducer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.ResourcePatternUtils;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.*;
 
 @Service
 public class BatchService {
     @Autowired
     TagcloudService tagcloudService;
+    @Autowired
+    ResourceLoader resourceLoader;
     @Autowired
     Paths paths;
 
@@ -87,10 +96,42 @@ public class BatchService {
         tfidfJob.waitForCompletion(true);
 
 
+        // tag cloud per doc
+        Map<String, List<WordFrequency>> freqs = getWordFreq(getWordCountFiles(""+timestamp));
+        for (String key : freqs.keySet()) {
+            tagcloudService.makeTagcloud(freqs.get(key), new File(paths.getTagclouds()+ key+"out.png"));
+        }
+
+    }
+
+    private List<File> getWordCountFiles(String tst) throws IOException {
+        Resource[] resources = ResourcePatternUtils.getResourcePatternResolver(resourceLoader).getResources("file:" + paths.getJob3() + tst + "/part*");
+        List<File> wordCountFiles = new ArrayList<>();
+        for (Resource r : resources) {
+            wordCountFiles.add(r.getFile());
+        }
+        return wordCountFiles;
+    }
 
 
-        // last job output format in text file:
-        // count: word
+    private Map<String, List<WordFrequency>> getWordFreq(List<File> fs) throws IOException{
+        Map<String, List<WordFrequency>> tfidfMap = new HashMap<>();
 
+        for (File f : fs) {
+            Scanner reader = new Scanner(f);
+            while (reader.hasNextLine()) {
+                String val = reader.nextLine();
+                // word@doc #
+                String[] tokens = val.split("\t");
+                String[] word_doc = tokens[0].split("@");
+                List<WordFrequency> tmp = tfidfMap.get(word_doc[1]);
+                if (tmp == null) { // doc not in map
+                    tmp = new ArrayList<>();
+                    tfidfMap.put(word_doc[1], tmp);
+                }
+                tmp.add(new WordFrequency(word_doc[0], Integer.parseInt(tokens[1])));
+            }
+        }
+        return tfidfMap;
     }
 }
