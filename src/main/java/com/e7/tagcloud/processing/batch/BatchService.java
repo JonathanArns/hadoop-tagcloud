@@ -25,6 +25,7 @@ public class BatchService {
 
     public void run() throws IOException, ClassNotFoundException, InterruptedException {
         Configuration conf = new Configuration();
+        long timestamp = System.currentTimeMillis();
 
         // Job: WordCount /////////////////////////////////////////////////////
         // word@filename : count
@@ -37,8 +38,8 @@ public class BatchService {
         wordCountJob.setOutputKeyClass(Text.class);
         wordCountJob.setOutputValueClass(IntWritable.class);
 
-        FileInputFormat.addInputPath(wordCountJob, new Path(paths.getUpload() + name));
-        FileOutputFormat.setOutputPath(wordCountJob, new Path(paths.getWordcounts() + name));
+        FileInputFormat.addInputPath(wordCountJob, new Path(paths.getUpload()));
+        FileOutputFormat.setOutputPath(wordCountJob, new Path(paths.getJob1() + timestamp));
 
         wordCountJob.waitForCompletion(true);
         ///////////////////////////////////////////////////////////////////////
@@ -54,8 +55,8 @@ public class BatchService {
         wordDocJob.setOutputKeyClass(Text.class);
         wordDocJob.setOutputValueClass(IntWritable.class);
 
-        FileInputFormat.addInputPath(wordCountJob, new Path(paths.getUpload() + name));
-        FileOutputFormat.setOutputPath(wordCountJob, new Path(paths.getWordcounts() + name));
+        FileInputFormat.addInputPath(wordCountJob, new Path(paths.getJob1() + timestamp));
+        FileOutputFormat.setOutputPath(wordCountJob, new Path(paths.getJob2() + timestamp));
 
         wordCountJob.waitForCompletion(true);
 
