@@ -67,7 +67,6 @@ public class BatchService {
         Configuration conf2 = new Configuration();
         Job wordDocJob = Job.getInstance(conf2, "word count per doc");
         wordDocJob.setMapperClass(WordCountInDocMapper.class);
-//        wordDocJob.setCombinerClass(IntSumReducer.class);
         wordDocJob.setReducerClass(WordCountInDocReducer.class);
         wordDocJob.setNumReduceTasks(2);
         wordDocJob.setOutputKeyClass(Text.class);
@@ -97,14 +96,14 @@ public class BatchService {
         tfidfJob.waitForCompletion(true);
 
 
-        // tag cloud per doc
+        // use Hadoop outputs to make tag clouds
         Map<String, List<WordFrequency>> freqs = getWordFreq(getWordCountFiles(""+timestamp));
         for (String key : freqs.keySet()) {
             File outputFile;
             if (key.equals("global")) {
                 outputFile = new File(paths.getGlobalTagcloud());
             } else
-                outputFile = new File(paths.getTagclouds() + key + "out.png");
+                outputFile = new File(paths.getTagclouds() + key + ".png");
             try {
                 tagcloudService.makeTagcloud(freqs.get(key), outputFile);
             } catch(IllegalArgumentException e) {

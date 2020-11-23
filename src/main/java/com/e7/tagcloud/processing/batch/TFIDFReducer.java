@@ -13,20 +13,17 @@ public class TFIDFReducer extends Reducer<Text, Text, Text, Text> {
     private static final DecimalFormat DF = new DecimalFormat("###.########");
 
     private Text wordAtDocument = new Text();
-
     private Text tfidfCounts = new Text();
 
     public TFIDFReducer() {
     }
 
-    protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException,
-            InterruptedException {
+    protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 
-        // get the number of documents indirectly from the file-system
         int numberOfDocumentsInCorpus = context.getConfiguration().getInt("docscount", 1);
-        // total frequency of this word
+
         int numberOfDocumentsInCorpusWhereKeyAppears = 0;
-        Map<String, String> tempFrequencies = new HashMap<String, String>();
+        Map<String, String> tempFrequencies = new HashMap<>();
         for (Text val : values) {
             String[] documentAndFrequencies = val.toString().split("=");
             tempFrequencies.put(documentAndFrequencies[0], documentAndFrequencies[1]);
@@ -36,8 +33,6 @@ public class TFIDFReducer extends Reducer<Text, Text, Text, Text> {
 
         }
 
-        // inverse document frequency quotient between the number of docs in corpus and number of docs the
-        // term appears Normalize the value in case the number of appearances is 0.
         double idf = Math.log10((double) numberOfDocumentsInCorpus /
                 (double) ((numberOfDocumentsInCorpusWhereKeyAppears == 0 ? 1 : 0) +
                         numberOfDocumentsInCorpusWhereKeyAppears));
@@ -45,10 +40,7 @@ public class TFIDFReducer extends Reducer<Text, Text, Text, Text> {
         for (String document : tempFrequencies.keySet()) {
             String[] wordFrequenceAndTotalWords = tempFrequencies.get(document).split("/");
 
-            // Term frequency is the quotient of the number occurrences of the term in document and the total
-            // number of terms in document
-            double tf = Double.parseDouble(wordFrequenceAndTotalWords[0])
-                    / Double.parseDouble(wordFrequenceAndTotalWords[1]);
+            double tf = Double.parseDouble(wordFrequenceAndTotalWords[0]) / Double.parseDouble(wordFrequenceAndTotalWords[1]);
 
             int tfIdf = (int) (tf * idf * 10000);
 

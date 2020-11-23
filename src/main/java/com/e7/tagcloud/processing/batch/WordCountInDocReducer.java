@@ -25,7 +25,6 @@ public class WordCountInDocReducer extends Reducer<Text, Text, Text, Text> {
         for(String wKey : someMap.keySet()) {
             Text ctxKey = new Text();
             ctxKey.set(wKey + "@-_-@" + key.toString());
-            System.out.println(ctxKey.toString());
             Text ctxVal = new Text();
             ctxVal.set(someMap.get(wKey) + "/" + sumOfAll);
             context.write(ctxKey, ctxVal);
