@@ -17,6 +17,7 @@ import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.reduce.IntSumReducer;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -102,10 +103,14 @@ public class BatchService {
             File outputFile;
             if (key.equals("global")) {
                 outputFile = new File(paths.getGlobalTagcloud());
-                System.out.println("GLOBAL KEY:" + key);
             } else
                 outputFile = new File(paths.getTagclouds() + key + "out.png");
-            tagcloudService.makeTagcloud(freqs.get(key), outputFile);
+            try {
+                tagcloudService.makeTagcloud(freqs.get(key), outputFile);
+            } catch(IllegalArgumentException e) {
+                LoggerFactory.getLogger(BatchService.class).error("Failed to create normalized Tagcloud for "
+                        + key + "\t\nCaused by: KUMO 0 0 BUG");
+            }
         }
 
     }

@@ -22,7 +22,7 @@
             <a th:href="@{/files/{filename}(filename=${file.key})}" th:text="${file.value}" />
         </li>
     </ul>
-    <h4>Tagclouds:</h4>
+    <h4>Tagclouds</h4>
     <ul>
         <li th:each="tagcloud : ${tagclouds}">
             <a th:href="@{/tagcloud/{filename}(filename=${tagcloud.key})}" th:text="${tagcloud.value}" />

@@ -19,7 +19,9 @@ public class SpeedService {
     Paths paths;
 
     public void createTagcloud(String name) throws IOException {
-        List<WordFrequency> wordFrequencies = new FrequencyAnalyzer().load(new File(paths.getUpload() + name));
+        FrequencyAnalyzer frequencyAnalyzer = new FrequencyAnalyzer();
+        frequencyAnalyzer.setWordFrequenciesToReturn(200);
+        List<WordFrequency> wordFrequencies = frequencyAnalyzer.load(new File(paths.getUpload() + name));
         tagcloudService.makeTagcloud(wordFrequencies, new File(paths.getTagclouds() + name + ".png"));
     }
 }

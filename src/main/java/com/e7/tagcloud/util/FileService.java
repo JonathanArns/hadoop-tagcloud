@@ -46,12 +46,13 @@ public class FileService {
 
     public Map<String, String> getTagcloudNames() throws IOException {
         Map<String, String> files = getFileNames();
+        Map<String, String> res = new HashMap<>();
         for (String name : files.keySet()) {
-            if (!hasTagcloud(name)) {
-                files.remove(name);
+            if (hasTagcloud(name)) {
+                res.put(name, files.get(name));
             }
         }
-        return files;
+        return res;
     }
 
     public Resource getFile(String name) {
